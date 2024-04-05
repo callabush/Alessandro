@@ -150,7 +150,8 @@ head(filtered_forward_reads)
 length(filtered_forward_reads)
 
 
-filtered_reverse_reads <- file.path(filtered_fastqs_path, paste0(samples, "_R2_filtered.fastq.gz"))
+filtered_reverse_reads <- file.path(filtered_fastqs_path, paste0(samples,
+                                                  "_R2_filtered.fastq.gz"))
 #Intuition check
 length(filtered_reverse_reads)
 ```
@@ -169,19 +170,21 @@ Parameters of filter and trim **DEPEND ON THE DATASET**
 
 ```{r filter-and-trim}
 #Assign a vector to filtered reads
-#Trim out poor bases, first three basepairs on forward reads
+#Trim out poor bases
 #Write out filtered fastq files
 filtered_reads <-
-  filterAndTrim(fwd = forward_reads, filt = filtered_forward_reads,
-              rev = reverse_reads, filt.rev = filtered_reverse_reads,
-              truncLen = c(200,200), trimLeft = c(60,65),
-              maxN = 0, maxEE = c(1, 1),truncQ = 2, rm.phix = TRUE,
-              compress = TRUE, multithread = 6)
+filterAndTrim(forward_reads, filtered_forward_reads,
+              reverse_reads, filtered_reverse_reads,
+               trimLeft = c(193,21),
+              maxN = 0, maxEE = c(1,1), truncQ = 2, 
+              rm.phix = TRUE, compress = TRUE, 
+              multithread = 6)
 
-# These files are described in Lee et al 2016 
+# These primers are described in Herlemann et al. 2011 and Caporaso et al. 2011
 # Describes library prep
-# Forward 5′ TCGTCGGCAG CGTCAGATGT GTATAAGAGA CAGCCTACGG GNGGCWGCAG 3′ (50)
-# Reverse 5′ GTCTCGTGGG CTCGGAGATG TGTATAAGAG ACAGGACTAC HVGGGTATCT AATCC (55) 3′
+# 341F 5′ CCTACGGGNGGCWGCAG 3′ (17)
+# 806R 5′ GGACTACHVGGGTWTCTAAT 3′ (20)
+# 785R 5′ GACTACHVGGGTATCTAATCC 3′ (21)
 
 ```
 
@@ -205,12 +208,12 @@ forward_filteredQual_plot_12 + reverse_filteredQual_plot_12
 # Aggregate all QC plots 
 # Forward reads
 forward_postQC_plot <- 
-  plotQualityProfile(forward_reads, aggregate = TRUE) + 
+  plotQualityProfile(filtered_forward_reads, aggregate = TRUE) + 
   labs(title = "Forward Post-QC")
 
 # reverse reads
 reverse_postQC_plot <- 
-  plotQualityProfile(reverse_reads, aggregate = TRUE) + 
+  plotQualityProfile(filtered_reverse_reads, aggregate = TRUE) + 
   labs(title = "Reverse Post-QC")
 
 postQC_aggregate_plot <- 
