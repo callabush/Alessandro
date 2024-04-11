@@ -1,0 +1,81 @@
+---
+title: "00_cutadapt"
+author: "Calla Bush St George"
+date: "`r Sys.Date()`"
+output:
+  html_document: 
+    code_folding: show
+    theme: spacelab
+    highlight: pygments
+    keep_md: no
+    toc: yes
+    toc_float:
+      collapsed: no
+      smooth_scroll: yes
+      toc_depth: 3
+  keep_md: true  
+editor_options: 
+  chunk_output_type: console
+---
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      fig.align = "center",
+                      fig.path = "../figures/") #Send any figure output to this folder
+```
+
+## Before you start
+
+### Set my seed
+```{bash set seed}
+# Any number can be chose
+RANDOM=567890
+```
+
+# Trim Primer & Adapter Sequences Using cutadapt
+
+Version 4.6 is available on the server. Run cutadapt with the options indicated
+in the code below. Sequencing is 300 basepairs, so the expected length minus
+the primer is about 280 bp. The primers used are 515F (GTGCCAGCMGCCGCGGTAA) and 
+806R (GGACTACNNGGGTATCTAAT).
+
+```{bash Set-Environment}
+# Set environment per BioHPC instructions
+cd data/00_cutadapt/fastq/
+
+export PYTHONPATH=/programs/cutadapt-4.6/lib/python3.9/site-packages:/programs/cutadapt-4.6/lib64/python3.9/site-packages
+export PATH=/programs/cutadapt-4.6/bin:$PATH
+```
+
+```{bash cutadapt}
+# Run command to test on one sample
+cutadapt -g GTGCCAGCMGCCGCGGTAA \
+-G GGGACTACNNGGGTATCTAAT \
+-o SRR17060816_trim_1.fastq.gz -p SRR17060816_trim_2.fastq.gz \
+SRR17060816_1.fastq.gz SRR17060816_2.fastq.gz
+
+
+# Run loop on all sample files 
+for sample in $(cat ../Birkim_samples.txt)
+
+do
+
+echo "On sample: $sample"
+
+cutadapt -g GTGCCAGCMGCCGCGGTAA \
+-G GGGACTACNNGGGTATCTAAT \
+-o ${sample}_trim_1.fq.gz -p ${sample}_trim_2.fq.gz \
+${sample}_1.fastq.gz ${sample}_2.fastq.gz \
+>> cutadapt_primer_trimming_stats.txt 2>&1
+
+done
+
+# Check percent reads kept, outputs table below
+paste ../Alessandro_samples.txt 
+<(grep "passing"cutadapt_primer_trimming_stats.txt | cut -f3 -d "(" | tr -d ")")
+<(grep "filtered" cutadapt_primer_trimming_stats.txt | cut -f3 -d "(" | tr -d ")")
+```
+
+
+

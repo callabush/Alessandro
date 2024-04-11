@@ -2,12 +2,18 @@
 title: "Infer ASVs with DADA2"
 author: "Calla Bush St George"
 date: "`r Sys.Date()`"
-output: html_document
-  toc: yes
-  toc_float: 
-    collapsed: no
-    smooth_scroll: yes
-    toc_depth: 3
+output:
+  html_document: 
+    code_folding: show
+    theme: spacelab
+    highlight: pygments
+    keep_md: no
+    toc: yes
+    toc_float:
+      collapsed: no
+      smooth_scroll: yes
+      toc_depth: 3
+  keep_md: true  
 editor_options: 
   chunk_output_type: console
 ---
@@ -68,7 +74,7 @@ pacman::p_load(tidyverse, devtools, dada2, phyloseq, patchwork, DT,
 ```{r load data}
 #Set the raw fastq path to the raw sequencing files
 #Path to the fastq files
-raw_fastqs_path <- "data/01_DADA2/01_raw_gzipped_fastqs"
+raw_fastqs_path <- "data/01_DADA2/00_trimmed_fastq"
 raw_fastqs_path
 #What files are in this path (Intuition check)
 list.files(raw_fastqs_path)
@@ -77,12 +83,12 @@ list.files(raw_fastqs_path)
 str(list.files(raw_fastqs_path))
 
 #Create a vector of forward reads
-forward_reads <- list.files(raw_fastqs_path, pattern = "_1.fastq.gz", full.names = TRUE) 
+forward_reads <- list.files(raw_fastqs_path, pattern = "_trim_1.fq.gz", full.names = TRUE) 
 #Intuition check
 head(forward_reads)
 
 #Create a vector of reverse reads
-reverse_reads <-list.files(raw_fastqs_path, pattern = "_2.fastq.gz", full.names = TRUE)
+reverse_reads <-list.files(raw_fastqs_path, pattern = "_trim_2.fq.gz", full.names = TRUE)
 #Intuition check
 head(reverse_reads)
 
@@ -173,18 +179,13 @@ Parameters of filter and trim **DEPEND ON THE DATASET**
 #Trim out poor bases
 #Write out filtered fastq files
 filtered_reads <-
-filterAndTrim(forward_reads, filtered_forward_reads,
-              reverse_reads, filtered_reverse_reads,
-               trimLeft = c(193,21),
-              maxN = 0, maxEE = c(1,1), truncQ = 2, 
-              rm.phix = TRUE, compress = TRUE, 
-              multithread = 6)
+  filterAndTrim(fwd = forward_reads, filt = filtered_forward_reads,
+              rev = reverse_reads, filt.rev = filtered_reverse_reads,
+               trimLeft = c(9,9),
+              maxN = 0, maxEE = c(1, 1),truncQ = 2, rm.phix = TRUE,
+              compress = TRUE, multithread = 6)
 
-# These primers are described in Herlemann et al. 2011 and Caporaso et al. 2011
-# Describes library prep
-# 341F 5′ CCTACGGGNGGCWGCAG 3′ (17)
-# 806R 5′ GGACTACHVGGGTWTCTAAT 3′ (20)
-# 785R 5′ GACTACHVGGGTATCTAATCC 3′ (21)
+
 
 ```
 
@@ -327,12 +328,12 @@ length(merged_ASVs)
 names(merged_ASVs)
 
 # Inspect the merger data.frame from the 20210602-MA-ABB1P 
-head(merged_ASVs[[3]])
+#head(merged_ASVs[[3]])
 ```
 
 
 # Create Raw ASV Count Table 
-```{r generate-ASV-table, fig.width=3.5, fig.height=3}
+```{r generate-raw-ASV-table, fig.width=3.5, fig.height=3}
 # Create the ASV Count Table 
 raw_ASV_table <- makeSequenceTable(merged_ASVs)
 
@@ -362,7 +363,7 @@ data.frame(Seq_Length = nchar(getSequences(raw_ASV_table))) %>%
 # 249 originates from our expected amplicon of 252 - 3bp in the forward read due to low quality.
 
 # We will allow for a few 
-raw_ASV_table_trimmed <- raw_ASV_table[,nchar(colnames(raw_ASV_table)) %in% 248:250]
+raw_ASV_table_trimmed <- raw_ASV_table[,nchar(colnames(raw_ASV_table)) %in% 242]
 
 # Inspect the distribution of sequence lengths of all ASVs in dataset 
 table(nchar(getSequences(raw_ASV_table_trimmed)))
