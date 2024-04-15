@@ -181,8 +181,7 @@ Parameters of filter and trim **DEPEND ON THE DATASET**
 filtered_reads <-
   filterAndTrim(fwd = forward_reads, filt = filtered_forward_reads,
               rev = reverse_reads, filt.rev = filtered_reverse_reads,
-               trimLeft = c(9,9),
-              maxN = 0, maxEE = c(1, 1),truncQ = 2, rm.phix = TRUE,
+              maxN = 0, maxEE = c(2, 2),truncQ = 2, rm.phix = TRUE,
               compress = TRUE, multithread = 6)
 
 
@@ -363,7 +362,7 @@ data.frame(Seq_Length = nchar(getSequences(raw_ASV_table))) %>%
 # 249 originates from our expected amplicon of 252 - 3bp in the forward read due to low quality.
 
 # We will allow for a few 
-raw_ASV_table_trimmed <- raw_ASV_table[,nchar(colnames(raw_ASV_table)) %in% 242]
+raw_ASV_table_trimmed <- raw_ASV_table[,nchar(colnames(raw_ASV_table)) %in% 253]
 
 # Inspect the distribution of sequence lengths of all ASVs in dataset 
 table(nchar(getSequences(raw_ASV_table_trimmed)))
