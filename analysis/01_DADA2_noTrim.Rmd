@@ -402,7 +402,7 @@ Chimera removal is an essential step in the analysis of 16S sequencing data to i
 # Remove the chimeras in the raw ASV table
 noChimeras_ASV_table <- removeBimeraDenovo(raw_ASV_table_trimmed, 
                                            method="consensus", 
-                                           multithread=TRUE, verbose=TRUE)
+                                           multithread=6, verbose=TRUE)
 
 # Check the dimensions
 dim(noChimeras_ASV_table)
