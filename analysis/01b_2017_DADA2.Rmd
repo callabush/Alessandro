@@ -140,7 +140,9 @@ preQC_aggregate_plot
 
 ```{r prep-filtered-reads}
 # vector of our samples, extract the sample information from our file
-samples <- sapply(strsplit(basename(forward_reads), "_"), `[`,1)
+samples <- 
+  scan("/local/workdir/cab565/git_repos/Alessandro/data/00_cutadapt/2017_samples.txt",
+                what = "character")
 #Intuition check
 head(samples)
 
@@ -526,21 +528,21 @@ Now, we will write the files! We will write the following to the `data/01_DADA2/
 # Save to regular .tsv file 
 # Write BOTH the modified and unmodified ASV tables to a file!
 # Write count table with ASV numbered names (e.g. ASV_1, ASV_2, etc)
-write.table(asv_tab, "data/01_DADA2/06_2017_analysis/ASV_counts.tsv", sep = "\t", quote = FALSE, col.names = NA)
+write.table(asv_tab, "data/01_DADA2/Alessandro_2017/ASV_counts.tsv", sep = "\t", quote = FALSE, col.names = NA)
 # Write count table with ASV sequence names
-write.table(noChimeras_ASV_table, "data/01_DADA2/06_2017_analysis/ASV_counts_withSeqNames.tsv", sep = "\t", quote = FALSE, col.names = NA)
+write.table(noChimeras_ASV_table, "data/01_DADA2/Alessandro_2017/ASV_counts_withSeqNames.tsv", sep = "\t", quote = FALSE, col.names = NA)
 # Write out the fasta file for reference later on for what seq matches what ASV
 asv_fasta <- c(rbind(asv_headers, asv_seqs))
 # Save to a file!
-write(asv_fasta, "data/01_DADA2/06_2017_analysis/ASVs.fasta")
+write(asv_fasta, "data/01_DADA2/Alessandro_2017/ASVs.fasta")
 
 # SECOND, let's save to a RData object 
 # Each of these files will be used in the analysis/02_Taxonomic_Assignment
 # RData objects are for easy loading :) 
-save(noChimeras_ASV_table, file = "data/01_DADA2/06_2017_analysis/noChimeras_ASV_table.RData")
-save(asv_tab, file = "data/01_DADA2/06_2017_analysis/ASV_counts.RData")
+save(noChimeras_ASV_table, file = "data/01_DADA2/Alessandro_2017/noChimeras_ASV_table.RData")
+save(asv_tab, file = "data/01_DADA2/Alessandro_2017/ASV_counts.RData")
 # And save the track_counts_df a R object, which we will merge with metadata information in the next step of the analysis in nalysis/02_Taxonomic_Assignment. 
-save(track_counts_df, file = "data/01_DADA2/06_2017_analysis/track_read_counts.RData")
+save(track_counts_df, file = "data/01_DADA2/Alessandro_2017/track_read_counts.RData")
 ```
 
 
